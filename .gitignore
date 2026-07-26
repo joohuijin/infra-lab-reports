@@ -1,3 +1,7 @@
 *.key
 session.key
 rndc.key
+
+*.key
+*.pem
+*.crt

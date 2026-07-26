@@ -1,0 +1,69 @@
+---
+# tasks file for DNS
+####################
+#1) 패키지 설치 bind, dbind-utils 
+#2) 서비스 설정 
+# - /etc/named.conf 
+# - /etc/named.rfc1912.zones
+#3) 서비스 기동 named.service
+#4) 방화벽 기동 dns
+####################
+- name: 패키지 설치 "{{ dns_pkgs }}"
+  ansible.builtin.dnf:
+    name: "{{ dns_pkgs }}"
+    state: present
+
+- name: 2) 서비스 설정  - /etc/named.rfc1912.zones
+  ansible.builtin.blockinfile:
+    path:  /etc/named.rfc1912.zones
+    block: |
+
+      zone "{{ domain_name }}" IN {  
+          type master;      
+          file "{{ dns_zone_file_src }}";
+      };
+
+      zone "{{ reverse_network }}" IN {
+        type master;
+        file "{{ dns_rev_file_src }}"; 
+      };    
+
+- name: 2) 서비스 설정 - {{ dns_conf_file_src }} -- copy --> {{ dns_conf_file_dst }}
+  ansible.builtin.copy:
+    src: "{{ dns_conf_file_src }}"
+    dest: "{{ dns_conf_file_dst }}"
+    owner: root 
+    group: named  
+    mode: '640'
+
+- name: 2) 서비스 설정 {{ dns_zone_file_src }} --copy --> {{ dns_zone_file_dst }}
+  ansible.builtin.copy:
+    src: "{{ dns_zone_file_src }}"
+    dest: "{{ dns_zone_file_dst }}"
+    owner: root 
+    group: named  
+    mode: '640'
+
+- name: 2) 서비스 설정 {{ dns_rev_file_src }} --copy --> {{ dns_rev_file_dst }}
+  ansible.builtin.copy:
+    src: "{{ dns_rev_file_src }}"
+    dest: "{{ dns_rev_file_dst }}"
+    owner: root 
+    group: named  
+    mode: '640'
+
+- name: 3) 서비스 기동 "{{ dns_svc }}"
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true 
+  loop: "{{ dns_svc }}"
+
+- name: 4) 방화벽 설정 - {{ dns_fw }}
+  ansible.posix.firewalld:
+    service: "{{ dns_fw }}"
+    permanent: true 
+    immediate: true 
+    state: enabled 
+
+  

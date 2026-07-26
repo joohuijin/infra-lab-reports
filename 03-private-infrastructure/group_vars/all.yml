@@ -1,0 +1,57 @@
+---
+dns_conn: eth0
+dns_ip: 192.168.10.11
+# 웹 서버 변수
+web_pkgs: httpd
+web_src_file: index.html
+web_dst_file: /var/www/html/index.html
+web_svcs: 
+  - httpd
+  - firewalld 
+web_fw:
+  - http
+  - https
+
+# dns 서버 변수 
+dns_pkgs: 
+  - bind
+  - bind-utils 
+domain_name: test.com
+reverse_network: "10.168.192.in-addr.arpa"
+dns_conf_file_src: named.conf 
+dns_conf_file_dst: /etc/named.conf 
+dns_zone_file_src: test.zone
+dns_zone_file_dst: /var/named/test.zone
+dns_rev_file_src: test.rev
+dns_rev_file_dst: /var/named/test.rev 
+dns_svc:
+  - named
+  - firewalld 
+dns_fw: dns 
+
+# mail 서버 변수 
+mail_postfix_pkgs: 
+      - postfix
+      - s-nail
+mail_postfix_main_file_src: main.cf
+mail_postfix_main_file_dst: /etc/postfix/main.cf
+mail_postfix_svcs:
+    - postfix
+    - firewalld 
+mail_dovecot_pkgs: dovecot
+mail_dovecot_conf_file_src: dovecot.conf 
+mail_dovecot_conf_file_dst: /etc/dovecot/dovecot.conf
+mail_dovecot_10mail_file_src: 10-mail.conf
+mail_dovecot_10mail_file_dst: /etc/dovecot/conf.d/10-mail.conf
+mail_dovecot_10auth_file_src: 10-auth.conf
+mail_dovecot_10auth_file_dst: /etc/dovecot/conf.d/10-auth.conf
+mail_10master_file_src: 10-master.conf
+mail_10master_file_dst: /etc/dovecot/conf.d/10-master.conf
+mail_10ssl_file_src: 10-ssl.conf
+mail_10ssl_file_dst: /etc/dovecot/conf.d/10-ssl.conf
+mail_dovecot_svcs:
+  - dovecot
+  - firewalld
+mail_dovecot_fw:
+  - pop3
+  - imap

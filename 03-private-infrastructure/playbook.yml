@@ -1,0 +1,35 @@
+---
+- name: 웹 서버 세팅
+  hosts: web_servers
+  tasks:
+    - name: 웹 서버 역할 호출 
+      ansible.builtin.include_role:
+        name: WEB     
+- name: DNS 서버 세팅
+  hosts: dns_servers
+  tasks:
+    - name: DNS 서버 세팅 
+      ansible.builtin.include_role:
+        name: DNS
+- name: DNS 클라이언트 설정
+  hosts: all:!dns_servers
+  tasks:
+    - name: DNS 클라이언트 설정
+      community.general.nmcli:
+        conn_name: "{{ dns_conn }}"
+        type: ethernet 
+        dns4: 
+          - "{{ dns_ip }}"
+        state: present 
+    - name: DNS 설정 적용
+      ansible.builtin.shell: "nmcli con up {{ dns_conn }}"       
+
+- name: MAIL 서버 
+  hosts: mail_servers
+  tasks:
+    - name: MAIL 서버
+      ansible.builtin.include_role:
+        name: MAIL 
+
+
+        

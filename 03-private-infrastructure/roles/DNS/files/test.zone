@@ -1,0 +1,19 @@
+$TTL 1D
+@       IN SOA  ns1.test.com. root.test.com. (
+                                        20260625  ; serial
+                                        1D        ; refresh
+                                        1H        ; retry
+                                        1W        ; expire
+                                        3H )      ; minimum
+
+;; (0) Name Server
+test.com.       IN  NS  ns1.test.com.
+ns1.test.com.   IN  A   192.168.10.11
+
+;; (1) Web Server 
+test.com.       IN  A   192.168.10.12
+www.test.com.   IN  A   192.168.10.12
+
+;; (2) Mail Server
+test.com.       IN  MX 10 mail.test.com.
+mail.test.com.  IN  A   192.168.10.13

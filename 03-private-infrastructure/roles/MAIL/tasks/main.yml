@@ -1,0 +1,104 @@
+---
+# tasks file for MAIL
+##########################
+#1. smtp
+#1) 패키지 설치 - postfix, s-nail
+#2) 서비스 설정 - main.cf --(copy) --> /etc/postfix/main.cf
+#2) 서비스 기동 - postfix 
+#3) 방화벽 기동 - smtp 
+#2. pop3
+#1) 패키지 설치 - dovecot
+#2) 서비스 설정 -  dovecot.conf --(copy)--> /etc/dovecot/dovecot.conf
+#2) 서비스 기동 - dovecot
+#3) 방화벽 기동 - pop3, imap
+##########################
+- name: SMTP 1) 패키지 설치 - {{ mail_postfix_pkgs }}
+  ansible.builtin.dnf:
+    name: "{{ mail_postfix_pkgs }}"
+    state: present 
+
+- name: SMTP 2) 서비스 설정 - {{ mail_main_file_src }} --(copy) --> {{ mail_main_file_dst }}
+  ansible.builtin.copy:
+    src: "{{ mail_postfix_main_file_src }}"
+    dest: "{{ mail_postfix_main_file_dst }}"
+    owner: root 
+    group: root 
+    mode: '644'
+
+- name: SMTP 3) 서비스 기동 - postfix, firewalld
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop: "{{ mail_postfix_svcs }}"
+
+
+- name: SMTP 4) 방화벽 기동 - smtp
+  ansible.posix.firewalld:
+    service: smtp 
+    permanent: true 
+    immediate: true
+    state: enabled
+
+
+- name: pop3 1) 패키지 설치 - "{{ mail_dovecot_pkgs }}"
+  ansible.builtin.dnf: 
+    name: "{{ mail_dovecot_pkgs }}"
+    state: present
+  
+- name: pop3 2) 서비스 설정 - {{mail_dovecot_conf_file_src}} --(copy)--> {{ mail_dovecot_conf_file_dst }}
+  ansible.builtin.copy:
+    src: "{{ mail_dovecot_conf_file_src }}"
+    dest: "{{ mail_dovecot_conf_file_dst }}"
+    owner: root 
+    group: root
+    mode: '644'
+
+- name: pop3 2) 서비스 설정 -  {{ mail_dovecot_10mail_file_src }} --(COPY)--> {{ mail_dovecot_10mail_file_dst }}
+  ansible.builtin.copy:
+    src: "{{ mail_dovecot_10mail_file_src }}"
+    dest: "{{ mail_dovecot_10mail_file_dst }}"
+    owner: root 
+    group: root
+    mode: '644'
+
+
+- name: pop3 2) 서비스 설정 -  {{ mail_dovecot_10auth_file_src }} --(copy)-->{{ mail_dovecot_10auth_file_dst }}
+  ansible.builtin.copy:
+    src: "{{ mail_dovecot_10auth_file_src }}"
+    dest: "{{ mail_dovecot_10auth_file_dst }}"
+    owner: root 
+    group: root
+    mode: '644'
+
+
+- name: pop3 2) 서비스 설정 -  {{ mail_10master_file_src }} --(copy)--> {{ mail_10master_file_dst }}
+  ansible.builtin.copy:
+    src: "{{ mail_10master_file_src }}"
+    dest: "{{ mail_10master_file_dst }}"
+    owner: root 
+    group: root
+    mode: '644'
+
+- name: pop3 2) 서비스 설정 -  {{ mail_10ssl_file_src }} --(copy)--> {{ mail_10ssl_file_dst }}
+  ansible.builtin.copy:
+    src: "{{ mail_10ssl_file_src }}"
+    dest: "{{ mail_10ssl_file_dst }}"
+    owner: root 
+    group: root
+    mode: '0644'
+
+- name: pop3 3) 서비스 기동 - {{ mail_dovecot_svcs }}
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop: "{{ mail_dovecot_svcs }}"
+
+- name: pop3 4) 방화벽 기동 - {{ mail_dovecot_fw }}
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: true 
+    immediate: true
+    state: enabled
+  loop: "{{ mail_dovecot_fw }}"

@@ -1,0 +1,9 @@
+[dns_servers]
+192.168.10.11
+
+[web_servers]
+192.168.10.12
+
+[mail_servers]
+192.168.10.13
+

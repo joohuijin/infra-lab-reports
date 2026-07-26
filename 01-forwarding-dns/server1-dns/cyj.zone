@@ -1,0 +1,15 @@
+$TTL 4
+@       IN SOA  ns1.cyj.com. root.cyj.com. (
+                                          10      ; serial
+                                          1D      ; refresh
+                                          1H      ; retry
+                                          1W      ; expire
+                                          3H )    ; minimum
+;; (0) DNS Server
+cyj.com.                 IN  NS  ns1.cyj.com.
+ns1.cyj.com.             IN  A   192.168.50.11
+;; (1) WEB Server
+www                      IN  A   192.168.30.12
+
+;; (2) FTP Server
+ftp                      IN  A   192.168.30.12 

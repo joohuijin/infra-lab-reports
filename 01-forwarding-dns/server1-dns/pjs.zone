@@ -1,0 +1,16 @@
+$TTL 4
+@       IN SOA  ns1.pjs.com. root.pjs.com. (
+                                          10      ; serial
+                                         1D      ; refresh
+                                         1H      ; retry
+                                         1W      ; expire
+                                         3H )    ; minimum
+;; (0) DNS Server
+pjs.com.                 IN  NS  ns1.pjs.com.
+ns1.pjs.com.             IN  A   192.168.50.11
+;; (1) WEB Server
+www                      IN  A   192.168.40.11
+
+;; (2) FTP Server
+ftp                      IN  A   192.168.40.11
+ 

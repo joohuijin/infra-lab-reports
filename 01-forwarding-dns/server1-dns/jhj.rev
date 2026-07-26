@@ -1,0 +1,12 @@
+$TTL 4
+@       IN SOA  ns1.jhj.com. root.jhj.com. (
+                                        10      ; serial
+                                        1D      ; refresh
+                                        1H      ; retry
+                                        1W      ; expire
+                                        3H )    ; minimum
+
+;; (0) DNS Server
+                IN  NS          ns1.jhj.com.
+12              IN  PTR         ns1.jhj.com.
+

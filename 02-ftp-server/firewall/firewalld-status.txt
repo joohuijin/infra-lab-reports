@@ -1,0 +1,17 @@
+public (active)
+  target: default
+  icmp-block-inversion: no
+  interfaces: ens160 ens224
+  sources: 
+  services: cockpit dhcpv6-client dns ssh
+  ports: 30000-30100/tcp
+  protocols: 
+  forward: yes
+  masquerade: yes
+  forward-ports: 
+  source-ports: 
+  icmp-blocks: 
+  rich rules: 
+	rule family="ipv4" source address="192.168.30.0/24" port port="2121" protocol="tcp" accept
+	rule family="ipv4" source address="192.168.50.0/24" port port="2121" protocol="tcp" accept
+	rule family="ipv4" source address="192.168.40.0/24" port port="2121" protocol="tcp" accept

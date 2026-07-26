@@ -1,0 +1,50 @@
+services:
+  myweb:
+    image: infra-web:1.0
+    container_name: myweb
+    privileged: true
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - web-html:/var/www/html
+    networks:
+      infra-net:
+        ipv4_address: 172.30.0.20
+    depends_on:
+      - mynfs
+    command: >
+      sh -c "yum -y install nfs-utils &&
+             mkdir -p /var/log/httpd &&
+             mount -t nfs4 -o vers=4.2,proto=tcp 172.30.0.1:/share /var/log/httpd &&
+             /usr/sbin/httpd -D FOREGROUND"
+    restart: unless-stopped
+
+  mynfs:
+    image: tjung03/infra-nfs:1.0
+    container_name: mynfs
+    privileged: true
+    network_mode: host
+    volumes:
+      - nfs-data:/exports
+    environment:
+      NFS_V4_ROOT: "/exports"
+      NFS_EXPORT_NAME: "share"
+      NFS_EXPORT_DIR: "/exports/share"
+      NFS_LOG_DIR: "/exports/share/logs"
+      NFS_ALLOWED_CLIENTS: "172.30.0.0/24 127.0.0.1"
+      NFS_EXPORT_OPTIONS: "rw,sync,no_subtree_check,no_root_squash,insecure"
+    restart: unless-stopped
+
+networks:
+  infra-net:
+    name: infra-net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+          gateway: 172.30.0.1
+
+volumes:
+  web-html:
+  nfs-data:

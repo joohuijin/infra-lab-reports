@@ -1,0 +1,103 @@
+services:
+  mydns:
+    image: infra-dns:1.0
+    container_name: mydns
+    ports:
+      - "5353:53/tcp"
+      - "5353:53/udp"
+    networks:
+      infra-net:
+        ipv4_address: 172.30.0.10
+    restart: unless-stopped
+
+  myweb:
+    image: infra-web:1.0
+    container_name: myweb
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - web-html:/var/www/html
+      - web-logs:/var/log/httpd
+    networks:
+      infra-net:
+        ipv4_address: 172.30.0.20
+    depends_on:
+      - mynfs
+    restart: unless-stopped
+
+  myftp:
+    image: infra-ftp:1.0
+    container_name: myftp
+    ports:
+      - "2121:21"
+      - "21100-21110:21100-21110"
+    environment:
+      PASV_ADDRESS: 172.30.0.30
+      PASV_MIN_PORT: 21100
+      PASV_MAX_PORT: 21110
+    volumes:
+      - ftp-pub:/var/ftp/pub
+    networks:
+      infra-net:
+        ipv4_address: 172.30.0.30
+    restart: unless-stopped
+
+  mymail:
+    image: infra-mail:1.0
+    container_name: mymail
+    ports:
+      - "2525:25"
+      - "8143:143"
+      - "8081:80"
+    volumes:
+      - mail-home:/home
+    networks:
+      infra-net:
+        ipv4_address: 172.30.0.40
+    restart: unless-stopped
+
+  mynfs:
+    image: infra-nfs:1.0
+    container_name: mynfs
+    privileged: true
+    ports:
+      - "2049:2049"
+    volumes:
+      - nfs-share:/exports
+    networks:
+      infra-net:
+        ipv4_address: 172.30.0.50
+    restart: unless-stopped
+
+  test-client:
+    image: alpine:3.23
+    container_name: test-client
+    command: ["sleep", "infinity"]
+    dns:
+      - 172.30.0.10
+    networks:
+      infra-net:
+        ipv4_address: 172.30.0.100
+    depends_on:
+      - mydns
+      - myweb
+      - myftp
+      - mymail
+      - mynfs
+
+networks:
+  infra-net:
+    name: infra-net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+          gateway: 172.30.0.1
+
+volumes:
+  web-html:
+  web-logs:
+  ftp-pub:
+  mail-home:
+  nfs-share:
